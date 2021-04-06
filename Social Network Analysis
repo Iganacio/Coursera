@@ -1,0 +1,65 @@
+## Part 2 - Company Emails
+
+import networkx as nx
+import pandas as pd
+import numpy as np
+import pickle
+from sklearn.ensemble import GradientBoostingClassifier
+
+
+G = nx.read_gpickle('email_prediction.txt')
+
+print(nx.info(G))
+
+
+def salary_predictions():
+    
+    #Import data as dataframe
+    df = pd.DataFrame(index=G.nodes())
+    
+    #Creating parameters
+    df['clustering'] = pd.Series(nx.clustering(G))
+    df['degree'] = pd.Series(G.degree())
+    df['ManagementSalary'] = pd.Series(nx.get_node_attributes(G, 'ManagementSalary'))
+    df["serial"]=df.index
+    Admit_masck=(df['ManagementSalary']==1) | (df['ManagementSalary']==0)
+    df_train=df.where(Admit_masck).dropna()
+    
+    Admit_masck2=(df['ManagementSalary']!=1) & (df['ManagementSalary']!=0)
+    #print(Admit_masck)
+    df_test = df.drop(df[df['ManagementSalary']==1].index)
+    df_test = df_test.drop(df_test[df_test['ManagementSalary']==0].index)
+    
+    
+    #Selected variables
+    df_trainY=df_train.loc[:,['ManagementSalary']]
+    df_trainX=df_train.loc[:,['clustering','degree']]
+    df_testX=df_test.loc[:,['clustering','degree']]    
+        
+    
+
+    #Model
+    grd = GradientBoostingClassifier(criterion='friedman_mse', init=None,
+              learning_rate=0.1, loss='deviance', max_depth=3,
+              max_features=None, max_leaf_nodes=None,
+              min_impurity_split=1e-07, min_samples_leaf=1,
+              min_samples_split=2, min_weight_fraction_leaf=0.0,
+              n_estimators=100, presort='auto', random_state=None,
+              subsample=1.0, verbose=0, warm_start=False)
+    grd.fit(df_trainX, df_trainY)
+    
+    #Result
+    y_pred_grd = grd.predict_proba(df_testX)[:, 1]
+    
+    #Format
+    Result = pd.Series(y_pred_grd, index = df_test.serial)    
+    return Result
+
+salary_predictions()
+
+
+
+
+
+
+
