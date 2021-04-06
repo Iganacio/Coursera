@@ -1,0 +1,212 @@
+import pandas as pd
+import numpy as np
+
+#Open the file
+doc = []
+with open('dates.txt') as file:
+    for line in file:
+        doc.append(line)
+
+df = pd.Series(doc)
+pd.set_option('display.max_rows', df.shape[0]+1)
+
+
+#Separate in sentences
+time_sentences=df.values
+df = pd.DataFrame(time_sentences, columns=['text'])
+
+
+#Extacting date in different formats
+
+df['fecha1']=df['text'].str.findall(r'(?P<Mes>[0-9]{1,2})/(?P<Dia>[0-9]{1,2})/(?P<Anno>[0-9]{2,4})')
+df['dia1']=df['text'].str.findall(r'[0-9]{1,2}/(?P<Dia>[0-9]{1,2})/[0-9]{2,4}')
+df['mes1']=df['text'].str.findall(r'(?P<Mes>[0-9]{1,2})/[0-9]{1,2}/[0-9]{2,4}')
+df['anno1']=df['text'].str.findall(r'[0-9]{1,2}/[0-9]{1,2}/(?P<Anno>[0-9]{2,4})')
+
+df['fecha2']=df['text'].str.findall(r'(?P<Mes>[0-9]{1,2})-(?P<Dia>[0-9]{1,2})-(?P<Anno>[0-9]{2,4})')
+df['dia2']=df['text'].str.findall(r'[0-9]{1,2}-(?P<Dia>[0-9]{1,2})-[0-9]{2,4}')
+df['mes2']=df['text'].str.findall(r'(?P<Mes>[0-9]{1,2})-[0-9]{1,2}-[0-9]{2,4}')
+df['anno2']=df['text'].str.findall(r'[0-9]{1,2}-[0-9]{1,2}-(?P<Anno>[0-9]{2,4})')
+
+df['fecha3']=df['text'].str.findall(r'(?P<Dia>[0-9]{1,2}) (?P<Mes>[A-Z]{1}[a-z]{2,7}) (?P<Anno>[0-9]{2,4})')
+df['dia3']=df['text'].str.findall(r'(?P<Dia>[0-9]{1,2}) [A-Z]{1}[a-z]{2,7} [0-9]{2,4}')
+df['mes3']=df['text'].str.findall(r'[0-9]{1,2} (?P<Mes>[A-Z]{1}[a-z]{2,7}) [0-9]{2,4}')
+df['anno3']=df['text'].str.findall(r'[0-9]{1,2} [A-Z]{1}[a-z]{2,7} (?P<Anno>[0-9]{2,4})')
+
+df['fecha4']=df['text'].str.findall(r'(?P<Mes>[A-Z]{1}[a-z]{2,10}) (?P<Dia>[0-9]{1,2}), (?P<Anno>[0-9]{2,4})')
+df['dia4']=df['text'].str.findall(r'[A-Z]{1}[a-z]{2,10} (?P<Dia>[0-9]{1,2}), [0-9]{2,4}')
+df['mes4']=df['text'].str.findall(r'(?P<Mes>[A-Z]{1}[a-z]{2,10}) [0-9]{1,2}, [0-9]{2,4}')
+df['anno4']=df['text'].str.findall(r'[A-Z]{1}[a-z]{2,10} [0-9]{1,2}, (?P<Anno>[0-9]{2,4})')
+
+df['fecha5']=df['text'].str.findall(r'(?P<Mes>[A-Z]{1}[a-z]{2,10}). (?P<Dia>[0-9]{1,2}), (?P<Anno>[0-9]{4})')
+df['dia5']=df['text'].str.findall(r'[A-Z]{1}[a-z]{2,10}. (?P<Dia>[0-9]{1,2}), [0-9]{4}')
+df['mes5']=df['text'].str.findall(r'(?P<Mes>[A-Z]{1}[a-z]{2,10}). [0-9]{1,2}, [0-9]{4}')
+df['anno5']=df['text'].str.findall(r'[A-Z]{1}[a-z]{2,10}. [0-9]{1,2}, (?P<Anno>[0-9]{4})')
+
+df['fecha6']=df['text'].str.findall(r'(?P<Mes>[A-Z]{1}[a-z]{2,10}) (?P<Dia>[0-9]{1,2}) (?P<Anno>[0-9]{2,4})')
+df['dia6']=df['text'].str.findall(r'[A-Z]{1}[a-z]{2,10} (?P<Dia>[0-9]{1,2}) [0-9]{2,4}')
+df['mes6']=df['text'].str.findall(r'(?P<Mes>[A-Z]{1}[a-z]{2,10}) [0-9]{1,2} [0-9]{2,4}')
+df['anno6']=df['text'].str.findall(r'[A-Z]{1}[a-z]{2,10} [0-9]{1,2} (?P<Anno>[0-9]{2,4})')
+
+df['fecha7']=df['text'].str.findall(r'(?P<Mes>[A-Z]{1}[a-z]{2,10}) (?P<Anno>[0-9]{2,4})')
+df['mes7']=df['text'].str.findall(r'(?P<Mes>[A-Z]{1}[a-z]{2,10}) [0-9]{2,4}')
+df['anno7']=df['text'].str.findall(r'[A-Z]{1}[a-z]{2,10} (?P<Anno>[0-9]{2,4})')
+
+df['fecha8']=df['text'].str.findall(r'(?P<Mes>[A-Z]{1}[a-z]{2,10}), (?P<Anno>[0-9]{2,4})')
+df['mes8']=df['text'].str.findall(r'(?P<Mes>[A-Z]{1}[a-z]{2,10}), [0-9]{2,4}')
+df['anno8']=df['text'].str.findall(r'[A-Z]{1}[a-z]{2,10}, (?P<Anno>[0-9]{2,4})')
+
+df['fecha9']=df['text'].str.findall(r'(?P<Mes>[0-9]{1,2})/(?P<Anno>[0-9]{4})')
+df['mes9']=df['text'].str.findall(r'(?P<Mes>[0-9]{1,2})/[0-9]{4}')
+df['anno9']=df['text'].str.findall(r'[0-9]{1,2}/(?P<Anno>[0-9]{4})')
+
+df['fecha10']=df['text'].str.findall(r'(?P<Anno>[0-9]{4})')
+df['anno10']=df['text'].str.findall(r'(?P<Anno>[0-9]{4})')
+
+
+
+df['Dia Real']=df['dia1']
+for n in range(1,7):
+    for i in range(0,499):
+        if not df["Dia Real"].iloc[i]:
+            df["Dia Real"].iloc[i]=df['dia'+str(n)].iloc[i]
+
+df['Mes Real']=df['mes1']
+for n in range(1,10):
+    for i in range(0,499):
+        if not df["Mes Real"].iloc[i]:
+            df["Mes Real"].iloc[i]=df['mes'+str(n)].iloc[i]
+            
+df['Anno Real']=df['anno1']
+for n in range(1,11):
+    for i in range(0,499):
+        if not df["Anno Real"].iloc[i]:
+            df["Anno Real"].iloc[i]=df['anno'+str(n)].iloc[i]
+
+
+#Cleaning
+df.loc[72]["Dia Real"]=df.loc[461]["Dia Real"][0]
+df.loc[461]["Dia Real"]=""
+df.loc[465]["Dia Real"]=""
+
+df.loc[459]["Mes Real"]=""
+df.loc[461]["Mes Real"]=""
+df.loc[465]["Mes Real"]=""
+df.loc[468]["Mes Real"]=""
+df.loc[439]["Mes Real"]=""
+df.loc[401]["Mes Real"]=""
+
+df.loc[339]["Mes Real"]=3#df.loc[339]["Mes Real"][3]
+df.loc[279]["Mes Real"]=9#df.loc[279]["Mes Real"][0]
+df.loc[271]["Mes Real"]=8#df.loc[271]["Mes Real"][1]
+df.loc[265]["Mes Real"]=4#df.loc[265]["Mes Real"][1]
+df.loc[248]["Mes Real"]=10#df.loc[248]["Mes Real"][1]
+df.loc[235]["Mes Real"]=10#df.loc[235]["Mes Real"][0]
+df.loc[72]["Mes Real"]=7#df.loc[72]["Mes Real"][0]
+
+#df.loc[339]["Anno Real"]=df.loc[339]["Anno Real"][3]
+#df.loc[279]["Anno Real"]=df.loc[279]["Anno Real"][0]
+#df.loc[271]["Anno Real"]=df.loc[271]["Anno Real"][1]
+#df.loc[265]["Anno Real"]=df.loc[265]["Anno Real"][1]
+#df.loc[248]["Anno Real"]=df.loc[248]["Anno Real"][1]
+#df.loc[235]["Anno Real"]=df.loc[235]["Anno Real"][0]
+#df.loc[72]["Anno Real"]=df.loc[72]["Anno Real"][0]
+#df.loc[339]["Anno Real"]=df.loc[339]["Anno Real"][3]
+
+df.loc[240]["Anno Real"]=df.iloc[240]["anno8"]
+df.loc[273]["Anno Real"]=df.iloc[273]["anno8"]
+df.loc[311]["Anno Real"]=df.iloc[311]["anno8"]
+df.loc[317]["Anno Real"]=df.iloc[317]["anno8"]
+df.loc[401]["Anno Real"]=df.iloc[401]["anno9"]
+df.loc[439]["Anno Real"]=df.iloc[439]["anno9"]
+
+df.loc[240]["Mes Real"]=df.iloc[240]["mes8"]
+df.loc[273]["Mes Real"]=df.iloc[273]["mes8"]
+df.loc[311]["Mes Real"]=df.iloc[311]["mes8"]
+df.loc[317]["Mes Real"]=df.iloc[317]["mes8"]
+df.loc[401]["Mes Real"]=df.iloc[401]["mes9"]
+df.loc[439]["Mes Real"]=df.iloc[439]["mes9"]
+
+df.loc[468]["Anno Real"]=1997
+df.loc[499]["Anno Real"]=1980
+
+for i in range(0,499):
+    try:
+        df["Mes Real"].iloc[i]=df["Mes Real"].iloc[i][0]
+    except:
+        df["Mes Real"].iloc[i]=df["Mes Real"].iloc[i]
+
+for i in range(0,499):
+    try:
+        df["Dia Real"].iloc[i]=df["Dia Real"].iloc[i][0]
+    except:
+        df["Dia Real"].iloc[i]=df["Dia Real"].iloc[i]
+        
+for i in range(0,499):
+    try:
+        df["Anno Real"].iloc[i]=df["Anno Real"].iloc[i][0]
+    except:
+        df["Anno Real"].iloc[i]=df["Anno Real"].iloc[i]
+
+df["Mes Real"] = np.where(df["Mes Real"] =="Jan",1,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="January",1,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="Janaury",1,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="Feb",2,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="February",2,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="Mar",3,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="March",3,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="Apr",4,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="April",4,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="May",5,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="Jun",6,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="June",6,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="Jul",7,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="July",7,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="Aug",8,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="August",8,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="Sep",9,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="September",9,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="Oct",10,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="October",10,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="Nov",11,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="November",11,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="Dec",12,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="December",12,df["Mes Real"])
+df["Mes Real"] = np.where(df["Mes Real"] =="Decemeber",12,df["Mes Real"])
+#df["Mes Real"] = np.where(df["Mes Real"] =="O",1,df["Mes Real"])
+
+df["Dia Real"]=pd.to_numeric(df["Dia Real"])
+df["Dia Real"].fillna(1, inplace=True)
+
+df["Mes Real"]=pd.to_numeric(df["Mes Real"])
+df["Mes Real"].fillna(1, inplace=True)
+
+df["Anno Real"]=pd.to_numeric(df["Anno Real"])
+df["Anno Real"] = np.where(df["Anno Real"] <1500,df["Anno Real"]+1900,df["Anno Real"])
+
+dff=df[["Dia Real", "Mes Real", "Anno Real"]]
+
+df["Anno Real"].iloc[271]=2008
+df["Anno Real"].iloc[339]=2005
+df["Anno Real"].iloc[265]=1989
+df["Mes Real"].iloc[248]=7
+df["Anno Real"].iloc[248]=1995
+df["Dia Real"].iloc[72]=11
+
+f=248
+print(df["text"].iloc[f])
+print(df["Anno Real"].iloc[f])
+print(df["Mes Real"].iloc[f])
+print(df["Dia Real"].iloc[f])
+
+
+#Order
+df["Orden"]=df.index
+df=df.sort_values(["Anno Real","Mes Real","Dia Real"], ascending=[True, True, True]) 
+
+
+#Result
+def date_sorter():
+    return df["Orden"]
+    
+print(date_sorter())
