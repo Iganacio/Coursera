@@ -1,0 +1,77 @@
+# New Connections Prediction
+
+
+import networkx as nx
+import pandas as pd
+import numpy as np
+import pickle
+from sklearn.ensemble import GradientBoostingClassifier
+
+
+df = pd.read_csv('Future_Connections.csv', index_col=0, converters={0: eval})
+df.tail(10)
+
+
+def new_connections_predictions():
+
+    #Obtein parameters  
+    Datos=list(df.index)
+    
+    L_jacard=list(nx.jaccard_coefficient(G,Datos))
+    Jacard=list()
+    for n in range(0,len(L_jacard)):
+        a,b,c=L_jacard[n]
+        Jacard.append(c)
+        
+    L_resource=list(nx.resource_allocation_index(G,Datos))
+    Resource=list()
+    for n in range(0,len(L_resource)):
+        a,b,c=L_resource[n]
+        Resource.append(c)
+
+    L_preferencial=list(nx.preferential_attachment(G,Datos))
+    Preferencial=list()
+    for n in range(0,len(L_preferencial)):
+        a,b,c=L_preferencial[n]
+        Preferencial.append(c)
+
+    df["Jacard"]=Jacard
+    df["Resource"]=Resource
+    df["Preferencial"]=Preferencial
+    df["Preferencial"]=df["Preferencial"]/max(Preferencial)
+
+
+#Separate it
+    Admit_masck=(df["Future Connection"]==1) | (df["Future Connection"]==0)
+    df_train=df.where(Admit_masck).dropna()
+    
+    df_test = df.drop(df[df["Future Connection"]==1].index)
+    df_test = df_test.drop(df_test[df_test["Future Connection"]==0].index)
+
+
+#Selected variables
+    df_trainY=df_train.loc[:,["Future Connection"]]
+    df_trainX=df_train.loc[:,["Jacard","Resource","Preferencial"]]
+    df_testX=df_test.loc[:,["Jacard","Resource","Preferencial"]]
+    
+    
+#Model
+    grd = GradientBoostingClassifier(criterion='friedman_mse', init=None,
+              learning_rate=0.1, loss='deviance', max_depth=3,
+              max_features=None, max_leaf_nodes=None,
+              min_impurity_split=1e-07, min_samples_leaf=1,
+              min_samples_split=2, min_weight_fraction_leaf=0.0,
+              n_estimators=100, presort='auto', random_state=None,
+              subsample=1.0, verbose=0, warm_start=False)
+    grd.fit(df_trainX, df_trainY)
+
+
+#Result
+    y_pred_grd = grd.predict_proba(df_testX)[:, 1]
+ 
+ 
+#Total fee
+    Resultado = pd.Series(y_pred_grd, index = df_test.index)    
+    return Resultado
+
+new_connections_predictions()
